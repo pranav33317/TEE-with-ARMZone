@@ -1,0 +1,74 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stdexcept>
+
+// Simulating a basic Trusted Execution Environment (TEE)
+// Non-Secure World and Secure World interaction through C++.
+
+// The Secure World class represents a "Secure" environment.
+class SecureWorld {
+public:
+    // Simulates a secure operation like encryption or data validation.
+    void executeSecureOperation(const std::string& operation) {
+        std::cout << "[Secure World] Executing secure operation: " << operation << std::endl;
+        
+        if (operation == "encrypt") {
+            encryptData();
+        } else if (operation == "decrypt") {
+            decryptData();
+        } else {
+            throw std::invalid_argument("Invalid operation requested in Secure World.");
+        }
+    }
+
+private:
+    void encryptData() {
+        std::cout << "[Secure World] Encrypting sensitive data..." << std::endl;
+        // Simulating encryption (no actual encryption here for simplicity).
+    }
+
+    void decryptData() {
+        std::cout << "[Secure World] Decrypting sensitive data..." << std::endl;
+        // Simulating decryption (no actual decryption here for simplicity).
+    }
+};
+
+// The Non-Secure World class represents the "Non-Secure" environment.
+class NonSecureWorld {
+public:
+    NonSecureWorld(SecureWorld& secureWorld) : secureWorld_(secureWorld) {}
+
+    // Simulates a request from the Non-Secure World to the Secure World.
+    void requestSecureOperation(const std::string& operation) {
+        std::cout << "[Non-Secure World] Requesting operation: " << operation << " from Secure World." << std::endl;
+
+        try {
+            // Call the Secure World to perform the requested operation.
+            secureWorld_.executeSecureOperation(operation);
+        } catch (const std::exception& e) {
+            std::cout << "[Non-Secure World] Error: " << e.what() << std::endl;
+        }
+    }
+
+private:
+    SecureWorld& secureWorld_;
+};
+
+// Main program simulating the TEE (with two worlds).
+int main() {
+    // Create a Secure World instance.
+    SecureWorld secureWorld;
+
+    // Create a Non-Secure World instance and pass the Secure World instance to it.
+    NonSecureWorld nonSecureWorld(secureWorld);
+
+    // Simulate the Non-Secure World making a secure operation request.
+    nonSecureWorld.requestSecureOperation("encrypt");  // Request encryption
+    nonSecureWorld.requestSecureOperation("decrypt");  // Request decryption
+
+    // Simulate a bad request that should trigger an exception.
+    nonSecureWorld.requestSecureOperation("invalid");  // Invalid operation
+
+    return 0;
+}
